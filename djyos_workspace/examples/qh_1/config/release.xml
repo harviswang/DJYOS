@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="GB2312" standalone="no"?>
+<CONFIGURATION>
+    <MEMORY>
+        <RXM LENGTH="512k" NAME="ROM1" RXW="RX" START="0x08000000"/>
+        <RXM LENGTH="0x400000" NAME="extram" RXW="RXW" START="0x60000000"/>
+        <RXM LENGTH="64k" NAME="RAM1" RXW="RXW" START="0x20000000"/>
+    </MEMORY>
+    <SECTIONS>
+        <LOADDEFAULT>
+            <RXM REGION="ROM1">
+                <SECTION TYPE="STARTUP">
+                    <INPUT>KEEP(* (.isr_vector .isr_vector.*))</INPUT>
+                    <INPUT>./src/bsp/arch/core/exceptions.o (.text .text.* .rodata .rodata.*)</INPUT>
+                    <INPUT>./src/bsp/arch/startup/*.o (.text .text.* .rodata .rodata.*)</INPUT>
+                    <INPUT>./src/loader/si/pre_loader.o (.text .text.* .rodata .rodata.*)</INPUT>
+                </SECTION>
+                <SECTION TYPE="PRELOAD">
+                    <INPUT>KEEP(* (.table.exceptions .table.exceptions.*))</INPUT>
+                    <INPUT>KEEP(* (.table.vectors .table.vectors.*))</INPUT>
+                    <INPUT>./src/loader/si/loader.o (.text .text.* .rodata .rodata.*)</INPUT>
+                    <INPUT>./src/bsp/arch/core/int_hard.o (.text .text.* .rodata .rodata.*)</INPUT>
+                    <INPUT>./src/djyos/int/int.o (.text .text.* .rodata .rodata.*)</INPUT>
+                    <INPUT>./src/bsp/arch/core/ints.o (.text .text.* .rodata .rodata.*)</INPUT>
+                    <INPUT>./src/user/critical/*.o (.text .text.* .rodata .rodata.*)</INPUT>
+                    <INPUT>./src/bsp/cpu_peripheral/src/gpio.o (.text .text.* .rodata .rodata.*)</INPUT>
+                    <INPUT>./src/loader/si/loader.o (.data .data.*)</INPUT>
+                    <INPUT>./src/bsp/arch/core/int_hard.o (.data .data.*)</INPUT>
+                    <INPUT>./src/djyos/int/int.o (.data .data.*)</INPUT>
+                    <INPUT>./src/bsp/arch/core/ints.o (.data .data.*)</INPUT>
+                    <INPUT>./src/user/critical/*.o (.data .data.*)</INPUT>
+                    <INPUT>./src/bsp/cpu_peripheral/src/gpio.o (.data .data.*)</INPUT>
+                </SECTION>
+                <SECTION TYPE="SYSLOAD">
+                    <INPUT>* (.text .text.* .rodata .rodata.*)</INPUT>
+                    <INPUT>* (.data .data.*)</INPUT>
+                </SECTION>
+            </RXM>
+        </LOADDEFAULT>
+        <RUNDEFAULT>
+            <RXM REGION="extram">
+                <SECTION TYPE="HEAP">
+                    <INPUT>* (.sys_heap)</INPUT>
+                </SECTION>
+                <SECTION TYPE="SYSLOAD">
+                    <INPUT>./src/bsp/board_peripheral/LCD_9325/LCD_9325.o (.bss .bss.* COMMON)</INPUT>
+                    <INPUT>./src/djyos/gui/window/gk_clip.o ./src/djyos/gui/window/gk_win.o (.bss .bss.* COMMON)</INPUT>
+                </SECTION>
+            </RXM>
+            <RXM REGION="RAM1">
+                <SECTION TYPE="PRELOAD">
+                    <INPUT>KEEP(* (.table.exceptions .table.exceptions.*))</INPUT>
+                    <INPUT>KEEP(* (.table.vectors .table.vectors.*))</INPUT>
+                    <INPUT>./src/loader/si/loader.o (.data .data.*)</INPUT>
+                    <INPUT>./src/bsp/arch/core/int_hard.o (.data .data.*)</INPUT>
+                    <INPUT>./src/djyos/int/int.o (.data .data.*)</INPUT>
+                    <INPUT>./src/bsp/arch/core/ints.o (.data .data.*)</INPUT>
+                    <INPUT>./src/user/critical/*.o (.data .data.*)</INPUT>
+                    <INPUT>./src/bsp/cpu_peripheral/src/gpio.o (.data .data.*)</INPUT>
+                    <INPUT>./src/loader/si/loader.o (.bss .bss.* COMMON)</INPUT>
+                    <INPUT>./src/bsp/arch/core/int_hard.o (.bss .bss.* COMMON)</INPUT>
+                    <INPUT>./src/djyos/int/int.o (.bss .bss.* COMMON)</INPUT>
+                    <INPUT>./src/bsp/arch/core/ints.o (.bss .bss.* COMMON)</INPUT>
+                    <INPUT>./src/user/critical/*.o (.bss .bss.* COMMON)</INPUT>
+                    <INPUT>./src/bsp/cpu_peripheral/src/gpio.o (.bss .bss.* COMMON)</INPUT>
+                </SECTION>
+                <SECTION TYPE="STACK">
+                    <INPUT>* (.stack.msp .stack.msp.*)</INPUT>
+                </SECTION>
+                <SECTION TYPE="SYSLOAD">
+                    <INPUT>* (.data .data.*)</INPUT>
+                    <INPUT>* (.bss .bss.* COMMON)</INPUT>
+                </SECTION>
+                <SECTION TYPE="HEAP">
+                    <INPUT>* (.display_heap)</INPUT>
+                </SECTION>
+            </RXM>
+        </RUNDEFAULT>
+    </SECTIONS>
+</CONFIGURATION>

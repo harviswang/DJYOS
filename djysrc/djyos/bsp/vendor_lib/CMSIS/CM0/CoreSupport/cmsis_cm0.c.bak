@@ -1,0 +1,663 @@
+
+#include <stdint.h>
+#include "cortexm0.h"
+#include "cmsis_cm0.h"
+
+/* ###################  Compiler specific Intrinsics  ########################### */
+
+#if defined ( __CC_ARM   ) /*------------------RealView Compiler -----------------*/
+__INLINE void __NOP(void)              
+{ 
+    nop 
+}
+__INLINE void __WFI(void)              
+{ 
+    wfi
+}
+__INLINE void __WFE(void)              
+{ 
+    wfe 
+}
+__INLINE void __SEV(void)              
+{
+    sev
+}
+__INLINE void __ISB(void)              
+{ 
+    isb
+}
+__INLINE void __DSB(void)              
+{ 
+    dsb
+}
+__INLINE void __DMB(void)              
+{ 
+    dmb
+}
+
+/* ARM armcc specific functions */
+
+/**
+ * @brief  Return the Process Stack Pointer
+ *
+ * @return ProcessStackPointer
+ *
+ * Return the actual process stack pointer
+ */
+__ASM u32 __get_PSP(void)
+{
+  mrs r0, psp
+  bx lr
+}
+
+/**
+ * @brief  Set the Process Stack Pointer
+ *
+ * @param  topOfProcStack  Process Stack Pointer
+ *
+ * Assign the value ProcessStackPointer to the MSP 
+ * (process stack pointer) Cortex processor register
+ */
+__ASM void __set_PSP(u32 topOfProcStack)
+{
+  msr psp, r0
+  bx lr
+}
+
+/**
+ * @brief  Return the Main Stack Pointer
+ *
+ * @return Main Stack Pointer
+ *
+ * Return the current value of the MSP (main stack pointer)
+ * Cortex processor register
+ */
+__ASM u32 __get_MSP(void)
+{
+  mrs r0, msp
+  bx lr
+}
+
+/**
+ * @brief  Set the Main Stack Pointer
+ *
+ * @param  topOfMainStack  Main Stack Pointer
+ *
+ * Assign the value mainStackPointer to the MSP 
+ * (main stack pointer) Cortex processor register
+ */
+__ASM void __set_MSP(u32 mainStackPointer)
+{
+  msr msp, r0
+  bx lr
+}
+
+/**
+ * @brief  Reverse byte order in unsigned short value
+ *
+ * @param   value  value to reverse
+ * @return         reversed value
+ *
+ * Reverse byte order in unsigned short value
+ */
+__ASM u32 __REV16(uint16_t value)
+{
+  rev16 r0, r0
+  bx lr
+}
+
+/**
+ * @brief  Reverse byte order in signed short value with sign extension to integer
+ *
+ * @param   value  value to reverse
+ * @return         reversed value
+ *
+ * Reverse byte order in signed short value with sign extension to integer
+ */
+__ASM int32_t __REVSH(int16_t value)
+{
+  revsh r0, r0
+  bx lr
+}
+
+
+/**
+ * @brief  Return the Priority Mask value
+ *
+ * @return PriMask
+ *
+ * Return state of the priority mask bit from the priority mask register
+ */
+__ASM u32 __get_PRIMASK(void)
+{
+  mrs r0, primask
+  bx lr
+}
+
+/**
+ * @brief  Set the Priority Mask value
+ *
+ * @param  priMask  PriMask
+ *
+ * Set the priority mask bit in the priority mask register
+ */
+__ASM void __set_PRIMASK(u32 priMask)
+{
+  msr primask, r0
+  bx lr
+}
+
+/**
+ * @brief  Return the Control Register value
+ * 
+ * @return Control value
+ *
+ * Return the content of the control register
+ */
+__ASM u32 __get_CONTROL(void)
+{
+  mrs r0, control
+  bx lr
+}
+
+/**
+ * @brief  Set the Control Register value
+ *
+ * @param  control  Control value
+ *
+ * Set the control register
+ */
+__ASM void __set_CONTROL(u32 control)
+{
+  msr control, r0
+  bx lr
+}
+
+#elif (defined (__ICCARM__)) /*------------------ ICC Compiler -------------------*/
+/* IAR iccarm specific functions */
+#pragma diag_suppress=Pe940
+__INLINE void __enable_irq(void)       { __ASM volatile ("cpsie i"); }
+__INLINE void __disable_irq(void)      { __ASM volatile ("cpsid i"); }
+
+__INLINE void __NOP(void)              { __ASM volatile ("nop"); }
+__INLINE void __WFI(void)              { __ASM volatile ("wfi"); }
+__INLINE void __WFE(void)              { __ASM volatile ("wfe"); }
+__INLINE void __SEV(void)              { __ASM volatile ("sev"); }
+__INLINE void __ISB(void)              { __ASM volatile ("isb"); }
+__INLINE void __DSB(void)              { __ASM volatile ("dsb"); }
+__INLINE void __DMB(void)              { __ASM volatile ("dmb"); }
+
+/**
+ * @brief  Return the Process Stack Pointer
+ *
+ * @return ProcessStackPointer
+ *
+ * Return the actual process stack pointer
+ */
+u32 __get_PSP(void)
+{
+  __ASM("mrs r0, psp");
+  __ASM("bx lr");
+}
+
+/**
+ * @brief  Set the Process Stack Pointer
+ *
+ * @param  topOfProcStack  Process Stack Pointer
+ *
+ * Assign the value ProcessStackPointer to the MSP 
+ * (process stack pointer) Cortex processor register
+ */
+void __set_PSP(u32 topOfProcStack)
+{
+  __ASM("msr psp, r0");
+  __ASM("bx lr");
+}
+
+/**
+ * @brief  Return the Main Stack Pointer
+ *
+ * @return Main Stack Pointer
+ *
+ * Return the current value of the MSP (main stack pointer)
+ * Cortex processor register
+ */
+u32 __get_MSP(void)
+{
+  __ASM("mrs r0, msp");
+  __ASM("bx lr");
+}
+
+/**
+ * @brief  Set the Main Stack Pointer
+ *
+ * @param  topOfMainStack  Main Stack Pointer
+ *
+ * Assign the value mainStackPointer to the MSP 
+ * (main stack pointer) Cortex processor register
+ */
+void __set_MSP(u32 topOfMainStack)
+{
+  __ASM("msr msp, r0");
+  __ASM("bx lr");
+}
+
+/**
+ * @brief  Reverse byte order in unsigned short value
+ *
+ * @param  value  value to reverse
+ * @return        reversed value
+ *
+ * Reverse byte order in unsigned short value
+ */
+u32 __REV16(uint16_t value)
+{
+  __ASM("rev16 r0, r0");
+  __ASM("bx lr");
+}
+
+/**
+ * @brief  Reverse byte order in signed short value with sign extension to integer
+ *
+ * @param   value  value to reverse
+ * @return         reversed value
+ *
+ * Reverse byte order in signed short value with sign extension to integer
+ */
+int32_t __REVSH(int16_t value)
+{
+  __ASM("revsh r0, r0");
+  __ASM("bx lr");
+}
+
+
+/**
+ * @brief  Return the Priority Mask value
+ *
+ * @return PriMask
+ *
+ * Return state of the priority mask bit from the priority mask register
+ */
+u32 __get_PRIMASK(void)
+{
+  __ASM("mrs r0, primask");
+  __ASM("bx lr");
+}
+
+/**
+ * @brief  Set the Priority Mask value
+ *
+ * @param  priMask  PriMask
+ *
+ * Set the priority mask bit in the priority mask register
+ */
+void __set_PRIMASK(u32 priMask)
+{
+  __ASM("msr primask, r0");
+  __ASM("bx lr");
+}
+
+/**
+ * @brief  Return the Control Register value
+ * 
+ * @return Control value
+ *
+ * Return the content of the control register
+ */
+u32 __get_CONTROL(void)
+{
+  __ASM("mrs r0, control");
+  __ASM("bx lr");
+}
+
+/**
+ * @brief  Set the Control Register value
+ *
+ * @param  control  Control value
+ *
+ * Set the control register
+ */
+void __set_CONTROL(u32 control)
+{
+  __ASM("msr control, r0");
+  __ASM("bx lr");
+}
+
+
+
+#pragma diag_default=Pe940
+
+
+#elif (defined (__GNUC__)) /*------------------ GNU Compiler ---------------------*/
+
+__INLINE void __enable_irq(void)       { __ASM volatile ("cpsie i"); }
+__INLINE void __disable_irq(void)      { __ASM volatile ("cpsid i"); }
+
+__INLINE void __NOP(void)              { __ASM volatile ("nop"); }
+__INLINE void __WFI(void)              { __ASM volatile ("wfi"); }
+__INLINE void __WFE(void)              { __ASM volatile ("wfe"); }
+__INLINE void __SEV(void)              { __ASM volatile ("sev"); }
+__INLINE void __ISB(void)              { __ASM volatile ("isb"); }
+__INLINE void __DSB(void)              { __ASM volatile ("dsb"); }
+__INLINE void __DMB(void)              { __ASM volatile ("dmb"); }
+/* GNU gcc specific functions */
+
+/**
+ * @brief  Return the Process Stack Pointer
+ *
+ * @return ProcessStackPointer
+ *
+ * Return the actual process stack pointer
+ */
+u32 __get_PSP(void) __attribute__( ( naked ) );
+u32 __get_PSP(void)
+{
+  u32 result=0;
+
+  __ASM volatile ("MRS %0, psp\n\t" 
+                  "MOV r0, %0 \n\t"
+                  "BX  lr     \n\t"  : "=r" (result) );
+  return(result);
+}
+
+/**
+ * @brief  Set the Process Stack Pointer
+ *
+ * @param  topOfProcStack  Process Stack Pointer
+ *
+ * Assign the value ProcessStackPointer to the MSP 
+ * (process stack pointer) Cortex processor register
+ */
+void __set_PSP(u32 topOfProcStack) __attribute__( ( naked ) );
+void __set_PSP(u32 topOfProcStack)
+{
+  __ASM volatile ("MSR psp, %0\n\t"
+                  "BX  lr     \n\t" : : "r" (topOfProcStack) );
+}
+
+/**
+ * @brief  Return the Main Stack Pointer
+ *
+ * @return Main Stack Pointer
+ *
+ * Return the current value of the MSP (main stack pointer)
+ * Cortex processor register
+ */
+u32 __get_MSP(void) __attribute__( ( naked ) );
+u32 __get_MSP(void)
+{
+  u32 result=0;
+
+  __ASM volatile ("MRS %0, msp\n\t" 
+                  "MOV r0, %0 \n\t"
+                  "BX  lr     \n\t"  : "=r" (result) );
+  return(result);
+}
+
+/**
+ * @brief  Set the Main Stack Pointer
+ *
+ * @param  topOfMainStack  Main Stack Pointer
+ *
+ * Assign the value mainStackPointer to the MSP 
+ * (main stack pointer) Cortex processor register
+ */
+void __set_MSP(u32 topOfMainStack) __attribute__( ( naked ) );
+void __set_MSP(u32 topOfMainStack)
+{
+  __ASM volatile ("MSR msp, %0\n\t"
+                  "BX  lr     \n\t" : : "r" (topOfMainStack) );
+}
+
+
+/**
+ * @brief  Return the Priority Mask value
+ *
+ * @return PriMask
+ *
+ * Return state of the priority mask bit from the priority mask register
+ */
+u32 __get_PRIMASK(void)
+{
+  u32 result=0;
+
+  __ASM volatile ("MRS %0, primask" : "=r" (result) );
+  return(result);
+}
+
+/**
+ * @brief  Set the Priority Mask value
+ *
+ * @param  priMask  PriMask
+ *
+ * Set the priority mask bit in the priority mask register
+ */
+void __set_PRIMASK(u32 priMask)
+{
+  __ASM volatile ("MSR primask, %0" : : "r" (priMask) );
+}
+
+/**
+ * @brief  Return the Control Register value
+* 
+*  @return Control value
+ *
+ * Return the content of the control register
+ */
+u32 __get_CONTROL(void)
+{
+  u32 result=0;
+
+  __ASM volatile ("MRS %0, control" : "=r" (result) );
+  return(result);
+}
+
+/**
+ * @brief  Set the Control Register value
+ *
+ * @param  control  Control value
+ *
+ * Set the control register
+ */
+void __set_CONTROL(u32 control)
+{
+  __ASM volatile ("MSR control, %0" : : "r" (control) );
+}
+
+
+/**
+ * @brief  Reverse byte order in integer value
+ *
+ * @param  value  value to reverse
+ * @return        reversed value
+ *
+ * Reverse byte order in integer value
+ */
+u32 __REV(u32 value)
+{
+  u32 result=0;
+  
+  __ASM volatile ("rev %0, %1" : "=r" (result) : "r" (value) );
+  return(result);
+}
+
+/**
+ * @brief  Reverse byte order in unsigned short value
+ *
+ * @param  value  value to reverse
+ * @return        reversed value
+ *
+ * Reverse byte order in unsigned short value
+ */
+u32 __REV16(uint16_t value)
+{
+  u32 result=0;
+  
+  __ASM volatile ("rev16 %0, %1" : "=r" (result) : "r" (value) );
+  return(result);
+}
+
+/**
+ * @brief  Reverse byte order in signed short value with sign extension to integer
+ *
+ * @param  value  value to reverse
+ * @return        reversed value
+ *
+ * Reverse byte order in signed short value with sign extension to integer
+ */
+int32_t __REVSH(int16_t value)
+{
+  u32 result=0;
+  
+  __ASM volatile ("revsh %0, %1" : "=r" (result) : "r" (value) );
+  return(result);
+}
+
+#endif
+/**
+ * @brief  Initiate a system reset request.
+ *
+ * Initiate a system reset request to reset the MCU
+ */
+__INLINE void NVIC_SystemReset(void)
+{
+  SCB->AIRCR  = ((0x5FA << SCB_AIRCR_VECTKEY_Pos)      | 
+                 SCB_AIRCR_SYSRESETREQ_Msk);
+  __DSB();                                                                             /* Ensure completion of memory access */              
+  while(1);                                                                            /* wait until reset */
+}
+
+/**
+ * @brief  Initialize and start the SysTick counter and its interrupt.
+ *
+ * @param   ticks   number of ticks between two interrupts
+ * @return  1 = failed, 0 = successful
+ *
+ * Initialise the system tick timer and its interrupt and start the
+ * system tick timer / counter in free running mode to generate 
+ * periodical interrupts.
+ */
+__INLINE u32 SysTick_Config(u32 ticks)
+{ 
+  if (ticks > SysTick_LOAD_RELOAD_Msk)  return (1);            /* Reload value impossible */
+                                                               
+  SysTick->LOAD  = (ticks & SysTick_LOAD_RELOAD_Msk) - 1;      /* set reload register */
+  NVIC_SetPriority (SysTick_IRQn, (1<<__NVIC_PRIO_BITS) - 1);  /* set Priority for Cortex-M0 System Interrupts */
+  SysTick->VAL   = 0;                                          /* Load the SysTick Counter Value */
+  SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk | 
+                   SysTick_CTRL_TICKINT_Msk   | 
+                   SysTick_CTRL_ENABLE_Msk;                    /* Enable SysTick IRQ and SysTick Timer */
+  return (0);                                                  /* Function successful */
+}
+
+/**
+ * @brief  Read the priority for an interrupt
+ *
+ * @param  IRQn      The number of the interrupt for get priority
+ * @return           The priority for the interrupt
+ *
+ * Read the priority for the specified interrupt. The interrupt 
+ * number can be positive to specify an external (device specific) 
+ * interrupt, or negative to specify an internal (core) interrupt.
+ *
+ * The returned priority value is automatically aligned to the implemented
+ * priority bits of the microcontroller.
+ *
+ * Note: The priority cannot be set for every core interrupt.
+ */
+__INLINE u32 NVIC_GetPriority(IRQn_Type IRQn)
+{
+
+  if(IRQn < 0) {
+    return((u32)((SCB->SHP[_SHP_IDX(IRQn)] >> _BIT_SHIFT(IRQn) ) >> (8 - __NVIC_PRIO_BITS)));  } /* get priority for Cortex-M0 system interrupts */
+  else {
+    return((u32)((NVIC->IPR[_IP_IDX(IRQn)] >> _BIT_SHIFT(IRQn) ) >> (8 - __NVIC_PRIO_BITS)));  } /* get priority for device specific interrupts  */
+}
+
+/**
+ * @brief  Set the priority for an interrupt
+ *
+ * @param  IRQn      The number of the interrupt for set priority
+ * @param  priority  The priority to set
+ *
+ * Set the priority for the specified interrupt. The interrupt 
+ * number can be positive to specify an external (device specific) 
+ * interrupt, or negative to specify an internal (core) interrupt.
+ *
+ * Note: The priority cannot be set for every core interrupt.
+ */
+__INLINE void NVIC_SetPriority(IRQn_Type IRQn, u32 priority)
+{
+  if(IRQn < 0) {
+    SCB->SHP[_SHP_IDX(IRQn)] = (SCB->SHP[_SHP_IDX(IRQn)] & ~(0xFF << _BIT_SHIFT(IRQn))) | 
+        (((priority << (8 - __NVIC_PRIO_BITS)) & 0xFF) << _BIT_SHIFT(IRQn)); }
+  else {
+    NVIC->IPR[_IP_IDX(IRQn)] = (NVIC->IPR[_IP_IDX(IRQn)] & ~(0xFF << _BIT_SHIFT(IRQn))) |
+        (((priority << (8 - __NVIC_PRIO_BITS)) & 0xFF) << _BIT_SHIFT(IRQn)); }
+}
+/**
+ * @brief  Enable Interrupt in NVIC Interrupt Controller
+ *
+ * @param  IRQn   The positive number of the external interrupt to enable
+ *
+ * Enable a device specific interupt in the NVIC interrupt controller.
+ * The interrupt number cannot be a negative value.
+ */
+__INLINE void NVIC_EnableIRQ(IRQn_Type IRQn)
+{
+  NVIC->ISER[0] = (1 << ((u32)(IRQn) & 0x1F)); /* enable interrupt */
+}
+
+/**
+ * @brief  Disable the interrupt line for external interrupt specified
+ * 
+ * @param  IRQn   The positive number of the external interrupt to disable
+ * 
+ * Disable a device specific interupt in the NVIC interrupt controller.
+ * The interrupt number cannot be a negative value.
+ */
+__INLINE void NVIC_DisableIRQ(IRQn_Type IRQn)
+{
+  NVIC->ICER[0] = (1 << ((u32)(IRQn) & 0x1F)); /* disable interrupt */
+}
+
+/**
+ * @brief  Read the interrupt pending bit for a device specific interrupt source
+ * 
+ * @param  IRQn    The number of the device specifc interrupt
+ * @return         1 = interrupt pending, 0 = interrupt not pending
+ *
+ * Read the pending register in NVIC and return 1 if its status is pending, 
+ * otherwise it returns 0
+ */
+__INLINE u32 NVIC_GetPendingIRQ(IRQn_Type IRQn)
+{
+  return((u32) ((NVIC->ISPR[0] & (1 << ((u32)(IRQn) & 0x1F)))?1:0)); /* Return 1 if pending else 0 */
+}
+
+/**
+ * @brief  Set the pending bit for an external interrupt
+ * 
+ * @param  IRQn    The number of the interrupt for set pending
+ *
+ * Set the pending bit for the specified interrupt.
+ * The interrupt number cannot be a negative value.
+ */
+__INLINE void NVIC_SetPendingIRQ(IRQn_Type IRQn)
+{
+  NVIC->ISPR[0] = (1 << ((u32)(IRQn) & 0x1F)); /* set interrupt pending */
+}
+
+/**
+ * @brief  Clear the pending bit for an external interrupt
+ *
+ * @param  IRQn    The number of the interrupt for clear pending
+ *
+ * Clear the pending bit for the specified interrupt. 
+ * The interrupt number cannot be a negative value.
+ */
+static __INLINE void NVIC_ClearPendingIRQ(IRQn_Type IRQn)
+{
+  NVIC->ICPR[0] = (1 << ((u32)(IRQn) & 0x1F)); /* Clear pending interrupt */
+}
+
